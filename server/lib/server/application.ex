@@ -10,7 +10,7 @@ defmodule Server.Application do
     children = [
       %{
         id: Server,
-        start: {Server, :connect_two_peers, []}
+        start: {Server, :start, []}
       }
     ]
 
