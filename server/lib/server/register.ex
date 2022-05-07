@@ -1,7 +1,7 @@
 defmodule Server.Reg do
 
   def new do
-    :ets.new(:register, [:set, :protected, :named_table])
+    :ets.new(:register, [:set, :public, :named_table])
   end
 
   #return boolean

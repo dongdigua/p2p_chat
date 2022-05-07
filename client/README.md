@@ -1,2 +1,2 @@
 # Client
-UDP peer-to-peer encrypted chat
+UDP peer-to-peer encrypted chat  
