@@ -12,8 +12,6 @@ defmodule Server.Conn do
   def add_peer(user_data) do
     if Server.Reg.session_valid?(sesstoken, passwd) do
       :ets.insert_new(:connection, {user_data.sesstoken, {user_data.addr, user_data.port, user_data.name}})
-    else
-      nil
     end
   end
 
@@ -26,12 +24,16 @@ defmodule Server.Conn do
   """
   def find_peer(user_data) do
     peer_found = :ets.lookup(:connection, user_data.sesstoken)
-    peer_found != []
+    if peer_found != [] do
+      :ets.delete(:connection, user_data.sesstoken)
+      send_to_each({user_data.addr, user_data.port, user_data.name}, peer_found)
+    end
   end
 
   def send_to_each({{ip0, port0, name0}, {ip1, port1, name1}}) do
     msg0 = "PEER:#{name1}:#{format_ip(ip1)}:port1"
     msg1 = "PEER:#{name0}:#{format_ip(ip0)}:port0"
+    {{{ip0, port0}, msg0}, {{ip1, port1}, msg1}}
   end
 
   def require_registion() do
