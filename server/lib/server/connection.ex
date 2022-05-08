@@ -10,7 +10,7 @@ defmodule Server.Conn do
   then the caller function will tell the client
   """
   def add_peer(user_data) do
-    if Server.Reg.session_valid?(sesstoken, passwd) do
+    if Server.Reg.session_valid?(user_data.sesstoken, user_data.passwd) do
       :ets.insert_new(:connection, {user_data.sesstoken, {user_data.addr, user_data.port, user_data.name}})
     end
   end
@@ -26,13 +26,13 @@ defmodule Server.Conn do
     peer_found = :ets.lookup(:connection, user_data.sesstoken)
     if peer_found != [] do
       :ets.delete(:connection, user_data.sesstoken)
-      send_to_each({user_data.addr, user_data.port, user_data.name}, peer_found)
+      send_to_each({user_data.addr, user_data.port, user_data.name}, hd(peer_found))
     end
   end
 
-  def send_to_each({{ip0, port0, name0}, {ip1, port1, name1}}) do
-    msg0 = "PEER:#{name1}:#{format_ip(ip1)}:port1"
-    msg1 = "PEER:#{name0}:#{format_ip(ip0)}:port0"
+  def send_to_each({ip0, port0, name0}, {_sesstoken, {ip1, port1, name1}}) do
+    msg0 = "PEER:#{name1}:#{format_ip(ip1)}:#{port1}"
+    msg1 = "PEER:#{name0}:#{format_ip(ip0)}:#{port0}"
     {{{ip0, port0}, msg0}, {{ip1, port1}, msg1}}
   end
 

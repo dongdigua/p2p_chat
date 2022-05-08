@@ -1,3 +1,0 @@
-# Server
-UDP hole punching
-
