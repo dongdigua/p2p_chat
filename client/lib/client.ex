@@ -25,7 +25,7 @@ defmodule Client do
 
   def handle_call({:find, name, sesstoken, passwd}, _from, client) do
     :ok = :gen_udp.send(client.socket, @serveraddr, @serverpt, Conn.find_peer(name, sesstoken, passwd))
-    case :gen_udp.recv(client.socket, 0) |> IO.inspect() |> Conn.parse_peer() do
+    case :gen_udp.recv(client.socket, 0) |> Conn.parse_peer() do
       {:ok, peer} ->
         {:reply, peer, %{client | peer: peer}}
       {:error, reason} ->
@@ -35,6 +35,17 @@ defmodule Client do
 
   def handle_call({:chat, text}, _from, client) do
     :ok = :gen_udp.send(client.socket, client.peer.addr, client.peer.port, text)    #TODO: exchange public keys
-    {:reply, :gen_udp.recv(client.socket, 0), client}
+    {:reply, :ok, client}
+  end
+
+  def handle_cast(:recv, client) do
+    spawn(fn -> recv_loop(client.socket) end)
+    {:noreply, client}
+  end
+
+
+  defp recv_loop(socket) do
+    :gen_udp.recv(socket, 0) |> IO.inspect()
+    recv_loop(socket)
   end
 end

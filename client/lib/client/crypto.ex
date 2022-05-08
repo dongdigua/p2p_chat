@@ -12,4 +12,9 @@ defmodule Client.Crypto do
   def decrypt(msg_encrypted, privkey) do
     :crypto.private_decrypt(:rsa, msg_encrypted, privkey, [])
   end
+
+  def hash(text) do
+    :crypto.hash(:sha256, text)
+    |> Base.encode16()
+  end
 end

@@ -10,7 +10,6 @@ defmodule Client.Conn do
   ERROR:reason
   """
   def parse_peer({:ok, recv}) do
-    recv |> IO.inspect()
     parse_data(elem(recv, 2))
   end
 
