@@ -45,7 +45,9 @@ defmodule Client do
 
 
   defp recv_loop(socket) do
-    :gen_udp.recv(socket, 0) |> IO.inspect()
+    {:ok, data} = :gen_udp.recv(socket, 0)
+    IO.puts(Enum.reduce(1..20, "", fn _x, acc -> acc <> IO.ANSI.cursor_left() end)
+    <> IO.ANSI.clear_line() <> "received: #{inspect(data)}")
     recv_loop(socket)
   end
 end
