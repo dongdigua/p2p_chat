@@ -34,6 +34,7 @@ defmodule Client.CLI do
     sesstoken = gets("(sesstoken)> ")
     passwd = gets("(password)> ") |> Client.Crypto.hash()
     peer = GenServer.call(:client, {:find, name, sesstoken, passwd}, :infinity)
+    GenServer.call(:client, :key, :infinity) |> IO.inspect()
     GenServer.cast(:client, :recv)
     chat(name, peer.name)
   end
