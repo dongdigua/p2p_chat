@@ -59,8 +59,7 @@ defmodule Client do
   defp recv_loop(socket, priv_key) do
     {:ok, {_ip, _port, data}} = :gen_udp.recv(socket, 0)
     decrypted = Client.Crypto.decrypt(data, priv_key)
-    IO.puts(Enum.reduce(1..20, "", fn _x, acc -> acc <> IO.ANSI.cursor_left() end)
-    <> IO.ANSI.clear_line() <> IO.ANSI.cyan() <> "received: #{inspect(decrypted)}" <> IO.ANSI.reset())
+    IO.puts(IO.ANSI.clear_line() <> "\r" <> IO.ANSI.cyan() <> "received: #{inspect(decrypted)}" <> IO.ANSI.reset())
     recv_loop(socket, priv_key)
   end
 end
