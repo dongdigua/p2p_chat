@@ -1,8 +1,8 @@
 defmodule Client.Crypto do
   @key_size 512
 
-  def generate_key(username) do
-    {_pub, _priv} = :crypto.generate_key(:rsa, {@key_size, username})
+  def generate_key(key_integer) do
+    {_pub, _priv} = :crypto.generate_key(:rsa, {@key_size, key_integer})
   end
 
   def encrypt(msg, pubkey) do

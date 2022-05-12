@@ -7,6 +7,7 @@ defmodule Client do
   """
   @serveraddr {127, 0, 0, 1}
   @serverpt 1234
+  @key_integer <<3>>   #should be a valid key_integer
   use GenServer
   alias Client.Conn
   defstruct [:socket, :name, :priv_key, peer: nil]
@@ -34,10 +35,10 @@ defmodule Client do
   end
 
   def handle_call(:key, _from, client) do
-    {pub, priv} = Client.Crypto.generate_key(client.name) |> IO.inspect()
+    {pub, priv} = Client.Crypto.generate_key(@key_integer)
     :ok = :gen_udp.send(client.socket, client.peer.addr, client.peer.port, hd(tl(pub)))
     {:ok, {_addr, _port, peer_pub}} = :gen_udp.recv(client.socket, 0)
-    full_peer_pub = [client.peer.name, peer_pub]
+    full_peer_pub = [@key_integer, peer_pub]
     {:reply, full_peer_pub,
       %{client | priv_key: priv, peer: %{client.peer | pub_key: full_peer_pub}}
     }
@@ -56,10 +57,10 @@ defmodule Client do
 
 
   defp recv_loop(socket, priv_key) do
-    {:ok, data} = :gen_udp.recv(socket, 0)
+    {:ok, {_ip, _port, data}} = :gen_udp.recv(socket, 0)
     decrypted = Client.Crypto.decrypt(data, priv_key)
-    IO.puts(Enum.reduce(1..16, "", fn _x, acc -> acc <> IO.ANSI.cursor_left() end)
-    <> IO.ANSI.clear_line() <> "received: #{inspect(decrypted)}")
+    IO.puts(Enum.reduce(1..20, "", fn _x, acc -> acc <> IO.ANSI.cursor_left() end)
+    <> IO.ANSI.clear_line() <> IO.ANSI.cyan() <> "received: #{inspect(decrypted)}" <> IO.ANSI.reset())
     recv_loop(socket, priv_key)
   end
 end

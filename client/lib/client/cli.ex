@@ -17,8 +17,7 @@ defmodule Client.CLI do
     case gets("=> ") do
       "register" -> register()
       "find" -> find_peer()
-      #"chat" -> chat()
-      _ -> IO.puts("register, find or chat")
+      _ -> IO.puts("register or find")
      end
   end
 
@@ -30,11 +29,11 @@ defmodule Client.CLI do
   end
 
   def find_peer do
-    name = gets("(name)> ")
+    name = gets("(my_name)> ")
     sesstoken = gets("(sesstoken)> ")
     passwd = gets("(password)> ") |> Client.Crypto.hash()
     peer = GenServer.call(:client, {:find, name, sesstoken, passwd}, :infinity)
-    GenServer.call(:client, :key, :infinity) |> IO.inspect()
+    GenServer.call(:client, :key, :infinity)
     GenServer.cast(:client, :recv)
     chat(name, peer.name)
   end
@@ -43,7 +42,7 @@ defmodule Client.CLI do
     prompt = "(#{my_name} -> #{peer_name})> "
     text = gets(prompt)
     if String.length(text) > 0 do
-      GenServer.call(:client, {:chat, text}) |> IO.inspect()
+      GenServer.call(:client, {:chat, text}) #|> IO.inspect()
     end
     chat(my_name, peer_name)
   end
