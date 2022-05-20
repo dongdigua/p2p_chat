@@ -6,7 +6,7 @@ defmodule Client.CLI do
       #name: :string
     ])
     if opts == [] or (args != [] && invalid != []) do
-      IO.puts "usage: p2p_chat --port <port>"
+      IO.puts "usage: client --port <port>"
     else
       Client.start_link(opts[:port])
       main_cli()
@@ -33,7 +33,7 @@ defmodule Client.CLI do
     sesstoken = gets("(sesstoken)> ")
     passwd = gets_passwd("(password)> ") |> Client.Crypto.hash()
     loading_pid = spawn(fn -> loading_rotate() end)
-    peer = GenServer.call(:client, {:find, name, sesstoken, passwd}, :infinity)
+    peer = GenServer.call(:client, {:find, name, sesstoken, passwd}, :infinity) |> IO.inspect()
     send(loading_pid, :stop)
     GenServer.call(:client, :key, :infinity)
     GenServer.cast(:client, :recv)

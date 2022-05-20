@@ -5,7 +5,8 @@ defmodule Client do
   @moduledoc """
   handles client-server IO
   """
-  @serveraddr {127, 0, 0, 1}
+  #@serveraddr {127, 0, 0, 1}
+  @serveraddr {124, 223, 181, 208}
   @serverpt 1234
   @key_integer <<3>>   #should be a valid key_integer
   use GenServer
