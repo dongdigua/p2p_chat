@@ -36,9 +36,12 @@ defmodule Client do
   end
 
   def handle_call(:key, _from, client) do
+    :ok = :gen_udp.send(client.socket, client.peer.addr, client.peer.port, <<"punch hole">>)
     {pub, priv} = Client.Crypto.generate_key(@key_integer)
     :ok = :gen_udp.send(client.socket, client.peer.addr, client.peer.port, hd(tl(pub)))
+    IO.puts "key sent"
     {:ok, {_addr, _port, peer_pub}} = :gen_udp.recv(client.socket, 0)
+    IO.puts "key received"
     full_peer_pub = [@key_integer, peer_pub]
     {:reply, full_peer_pub,
       %{client | priv_key: priv, peer: %{client.peer | pub_key: full_peer_pub}}
